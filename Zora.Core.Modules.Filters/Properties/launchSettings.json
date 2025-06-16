@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Zora.Core.Modules.Filters": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52626;http://localhost:52627"
+    }
+  }
+}

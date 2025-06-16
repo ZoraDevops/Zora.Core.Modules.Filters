@@ -1,0 +1,51 @@
+﻿trigger:
+  branches:
+    include:
+      - develop
+
+variables:
+  ProjectName: 'Zora.Core.Modules.Filters'
+  ProjectPath: '**/Zora.Core.Modules.Filters.csproj'
+  BuildConfiguration: 'Release'
+
+pool:
+  vmImage: ubuntu-22.04 
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'  
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'    
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore' 
+  inputs:
+    command: 'restore'
+    projects: '$(ProjectPath)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build $(ProjectName)'
+  inputs:
+    command: 'build'
+    projects: '$(ProjectPath)'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack $(ProjectName)'
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(ProjectPath)'
+    versioningScheme: off
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: NuGetCommand@2
+  displayName: 'Publish $(ProjectName)'
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'hutch-zora'
+    versioningScheme: 'off'
